@@ -78,14 +78,6 @@ section { padding: 72px 0; }
 /* Plat de la semaine */
 .menu { background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .menu-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: start; }
-.feature {
-  background: var(--green-dark); color: #fff; border-radius: 24px; padding: 36px 32px;
-}
-.feature .when { display: inline-block; background: var(--green); color: var(--ink); font-weight: 600; font-size: .85rem; padding: 5px 12px; border-radius: 999px; margin-bottom: 16px; }
-.feature h3 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 6px; }
-.feature .price { font-size: 1.3rem; font-weight: 600; color: #cdeec5; margin-bottom: 16px; }
-.feature p { color: #e3f1df; }
-.feature .allergens { margin-top: 14px; font-size: .9rem; color: #bfe0b8; }
 .upcoming { list-style: none; }
 .upcoming li {
   display: flex; justify-content: space-between; gap: 12px; align-items: baseline;
@@ -94,7 +86,6 @@ section { padding: 72px 0; }
 .upcoming .d { color: var(--muted); font-size: .9rem; white-space: nowrap; }
 .upcoming .n { font-weight: 600; flex: 1; }
 .upcoming .p { font-weight: 600; color: var(--green-dark); white-space: nowrap; }
-.note { margin-top: 16px; font-size: .9rem; color: var(--muted); }
 
 /* Emplacements */
 .days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
@@ -208,3 +199,17 @@ footer a { color: var(--muted); }
 
 /* Avis Google : le bloc reste masqué tant que le widget n’est pas collé */
 .reviews-widget:empty { display: none; }
+
+/* Programme et fiches des plats */
+.menu-sub { font-size: 1.15rem; font-weight: 800; color: var(--green-dark); margin-bottom: 8px; }
+.upcoming li.now { background: var(--green-soft); border-radius: 12px; padding: 14px 12px; border-bottom-color: transparent; }
+.upcoming em { font-style: normal; font-size: .75rem; font-weight: 600; background: var(--green); color: var(--ink); padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap; }
+.dishes { display: grid; gap: 14px; }
+.dish { border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; background: var(--bg); }
+.dish.now { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
+.dish h4 { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+.dish p { color: var(--muted); font-size: .95rem; }
+.dish .allergens { margin-top: 8px; font-size: .85rem; }
+.dish.now p { color: #e3f1df; }
+.dish.now .allergens { color: #bfe0b8; }
+.dish .when { display: inline-block; background: var(--green); color: var(--ink); font-weight: 600; font-size: .8rem; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }

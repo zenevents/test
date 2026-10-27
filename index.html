@@ -54,13 +54,16 @@
     <div class="wrap">
       <div class="title">
         <h2>Le plat de la semaine</h2>
-        <p>Un seul plat par semaine, préparé avec soin. Poulet IP Suisse, tofu ou mixte.</p>
+        <p>Un seul plat par semaine, préparé avec soin, au poulet suisse et/ou tofu bio.</p>
       </div>
       <div class="menu-grid">
-        <div class="feature" id="feature"></div>
         <div>
-          <ul class="upcoming" id="upcoming"></ul>
-          <p class="note">* +1 CHF sans contenant personnel</p>
+          <h3 class="menu-sub">Le programme</h3>
+          <ul class="upcoming" id="programme"></ul>
+        </div>
+        <div>
+          <h3 class="menu-sub">Les plats</h3>
+          <div class="dishes" id="plats"></div>
         </div>
       </div>
     </div>
@@ -182,46 +185,61 @@
   <script src="site.js"></script>
 
   <script>
+    // Chaque plat n'est décrit qu'une fois ici ; le pad thaï est toujours présenté en premier.
+    const dishes = {
+      padthai: {
+        name: "Pad thaï au poulet suisse et/ou tofu bio",
+        desc: "Le plat phare de Debi's Kitchen : nouilles de riz sautées « minute » aux oignons de printemps, pousses de mung, carottes, sauce maison.",
+        allergens: "Allergènes dans le pad thaï : ail, sauce d'huîtres et sauce de poisson. Servis à part : cacahuètes, coriandre, piment fort."
+      },
+      krapao: {
+        name: "Pad kra pao (basilic)",
+        desc: "Cette spécialité thaïlandaise au goût incomparable et savoureuse au basilic thaï est servie avec du riz parfumé et du concombre.",
+        allergens: "Allergènes : ail, sauce d'huîtres. Servis à part : coriandre, piment."
+      },
+      curry: {
+        name: "Curry japonais",
+        desc: "Le curry japonais est plus doux que son cousin indien. Très prisé au Japon, il est moins relevé et plus épais que le curry d'Inde, et ses ingrédients incontournables sont les carottes, les pommes de terre et l'oignon.",
+        allergens: "Servi à part : piment."
+      }
+    };
+
     // Programme : chaque semaine va du lundi (start) au vendredi (end).
     // Pour mettre à jour le menu, il suffit de modifier cette liste.
     const weeks = [
-      { start: "2026-10-26", end: "2026-10-30", label: "26–30 oct", name: "Pad thaï", price: "CHF 19*",
-        desc: "Le plat phare de Debi's Kitchen : nouilles de riz sautées « minute » aux oignons de printemps, pousses de mung, carottes, sauce maison.",
-        allergens: "Allergènes : ail, sauce d'huîtres, sauce de poisson. Servis à part : cacahuètes, coriandre, piment fort." },
-      { start: "2026-11-02", end: "2026-11-06", label: "2–6 nov", name: "Curry japonais", price: "CHF 22*",
-        desc: "", allergens: "" },
-      { start: "2026-11-09", end: "2026-11-13", label: "9–13 nov", name: "Pad thaï", price: "CHF 19*",
-        desc: "Le plat phare de Debi's Kitchen : nouilles de riz sautées « minute » aux oignons de printemps, pousses de mung, carottes, sauce maison.",
-        allergens: "Allergènes : ail, sauce d'huîtres, sauce de poisson. Servis à part : cacahuètes, coriandre, piment fort." },
-      { start: "2026-11-16", end: "2026-11-20", label: "16–20 nov", name: "Pad kra pao (basilic)", price: "CHF 19*",
-        desc: "Spécialité thaïlandaise au goût incomparable, savoureuse au basilic thaï, servie avec du riz parfumé et du concombre.",
-        allergens: "Allergènes : ail, sauce d'huîtres. Servis à part : coriandre, piment." },
-      { start: "2026-11-23", end: "2026-11-27", label: "23–27 nov", name: "Pad thaï", price: "CHF 19*",
-        desc: "Le plat phare de Debi's Kitchen : nouilles de riz sautées « minute » aux oignons de printemps, pousses de mung, carottes, sauce maison.",
-        allergens: "Allergènes : ail, sauce d'huîtres, sauce de poisson. Servis à part : cacahuètes, coriandre, piment fort." }
+      { start: "2026-10-26", end: "2026-10-30", label: "26–30 oct", dish: "padthai", price: "CHF 19" },
+      { start: "2026-11-02", end: "2026-11-06", label: "2–6 nov",   dish: "krapao",  price: "CHF 19" },
+      { start: "2026-11-09", end: "2026-11-13", label: "9–13 nov",  dish: "padthai", price: "CHF 19" },
+      { start: "2026-11-16", end: "2026-11-20", label: "16–20 nov", dish: "curry",   price: "CHF 22" },
+      { start: "2026-11-23", end: "2026-11-27", label: "23–27 nov", dish: "padthai", price: "CHF 19" }
     ];
 
     const today = new Date();
     const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
     const t = iso(today);
-
-    // Semaine en vedette : celle en cours, sinon la prochaine, sinon la dernière connue.
-    let i = weeks.findIndex(w => t <= w.end);
-    if (i === -1) i = weeks.length - 1;
-    const cur = weeks[i];
-    const isNow = t >= cur.start && t <= cur.end;
-
     const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-    document.getElementById("feature").innerHTML =
-      '<span class="when">' + (isNow ? "Cette semaine · " : "Prochainement · ") + esc(cur.label) + '</span>' +
-      '<h3>' + esc(cur.name) + '</h3>' +
-      '<div class="price">' + esc(cur.price) + '</div>' +
-      (cur.desc ? '<p>' + esc(cur.desc) + '</p>' : '') +
-      (cur.allergens ? '<p class="allergens">' + esc(cur.allergens) + '</p>' : '');
 
-    document.getElementById("upcoming").innerHTML = weeks.slice(i + 1).map(w =>
-      '<li><span class="d">' + esc(w.label) + '</span><span class="n">' + esc(w.name) + '</span><span class="p">' + esc(w.price) + '</span></li>'
+    // On masque les semaines passées ; la semaine en cours est mise en avant.
+    const shown = weeks.filter(w => t <= w.end);
+    const current = shown.find(w => t >= w.start);
+
+    document.getElementById("programme").innerHTML = shown.map(w =>
+      '<li' + (w === current ? ' class="now"' : '') + '><span class="d">' + esc(w.label) + '</span>' +
+      '<span class="n">' + esc(dishes[w.dish].name) + (w === current ? ' <em>Cette semaine</em>' : '') + '</span>' +
+      '<span class="p">' + esc(w.price) + '</span></li>'
     ).join("") || '<li><span class="n">Le programme suivant arrive bientôt.</span></li>';
+
+    // Une fiche par plat : le pad thaï d'abord, puis les autres dans l'ordre du programme.
+    const order = ["padthai"];
+    shown.forEach(w => { if (!order.includes(w.dish)) order.push(w.dish); });
+    document.getElementById("plats").innerHTML = order.map(k => {
+      const d = dishes[k];
+      const isNow = current && current.dish === k;
+      return '<article class="dish' + (isNow ? ' now' : '') + '">' +
+        (isNow ? '<span class="when">Cette semaine</span>' : '') +
+        '<h4>' + esc(d.name) + '</h4><p>' + esc(d.desc) + '</p>' +
+        '<p class="allergens">' + esc(d.allergens) + '</p></article>';
+    }).join("");
 
     // Met en avant l'emplacement du jour.
     const day = document.querySelector('.day[data-day="' + today.getDay() + '"]');
