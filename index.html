@@ -57,6 +57,11 @@
     }
     .hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; margin-bottom: 18px; }
     .hero h1 em { font-style: normal; color: var(--green); }
+    .hero .slogan {
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 600;
+      font-size: clamp(1.25rem, 2.6vw, 1.6rem); color: var(--green-dark);
+      margin: -4px 0 18px; max-width: none;
+    }
     .hero p { color: var(--muted); font-size: 1.1rem; max-width: 46ch; margin-bottom: 28px; }
     .actions { display: flex; flex-wrap: wrap; gap: 12px; }
     .btn {
@@ -175,6 +180,7 @@
       <div>
         <span class="badge">Sélectionné par la Ville de Genève depuis 2014</span>
         <h1>Quality <em>street food</em> asiatique</h1>
+        <p class="slogan">Un plat par semaine, tout le goût de l'Asie.</p>
         <p>Debi &amp; Greg cuisinent au foodtruck : pad thaï sauté minute, satay maison, pad kra pao… du lundi au vendredi, à midi, dans Genève.</p>
         <div class="actions">
           <a href="#menu" class="btn">Plat de la semaine</a>
