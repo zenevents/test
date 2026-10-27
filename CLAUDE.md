@@ -31,6 +31,11 @@ Cycle de 6 semaines, puis on recommence :
 - CHF 25 : phở bò.
 - +1 CHF sans contenant personnel. Desserts CHF 6 (+2 CHF de consigne), boissons CHF 4.
 
+## Produits
+
+- Poulet IP Suisse (Genève), certifié halal.
+- Tofu Bio Bourgeon.
+
 ## Contacts affichés
 
 - E-mail : info@debiskitchen.ch (confirmé par Debi)
