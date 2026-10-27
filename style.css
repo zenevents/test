@@ -233,3 +233,6 @@ footer a { color: var(--muted); }
 .menu-note { margin-top: 14px; font-size: .9rem; color: var(--muted); }
 .menu-note + .menu-note { margin-top: 6px; }
 .menu-note strong { color: var(--ink); }
+.group-box { margin-top: 26px; padding: 20px 22px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(121, 198, 109, .35); }
+.group-box h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+.group-box p { margin-bottom: 14px; }
