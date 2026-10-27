@@ -41,6 +41,7 @@ Cycle de 6 semaines, puis on recommence :
 - E-mail : info@debiskitchen.ch (confirmé par Debi)
 - Téléphone événements : +41 76 629 99 00 (confirmé)
 - WhatsApp foodtruck : 076 026 40 57
+- Instagram : https://www.instagram.com/debiskitchen.ch/ · Facebook : https://www.facebook.com/debiskitch.ch
 
 ## Avis Google
 
