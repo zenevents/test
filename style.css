@@ -217,7 +217,9 @@ footer a { color: var(--muted); }
 
 /* Programme et fiches des plats */
 .menu-sub { font-size: 1.15rem; font-weight: 800; color: var(--green-dark); margin-bottom: 8px; }
-.upcoming li.now { background: var(--green-soft); border-radius: 12px; padding: 14px 12px; border-bottom-color: transparent; }
+.upcoming li.now { background: var(--green-dark); color: #fff; border-radius: 12px; padding: 14px 12px; border-bottom-color: transparent; }
+.upcoming li.now .d { color: #bfe0b8; }
+.upcoming li.now .p { color: #cdeec5; }
 .upcoming em { font-style: normal; font-size: .75rem; font-weight: 600; background: var(--green); color: var(--ink); padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap; }
 .dishes { display: grid; gap: 14px; }
 .dish { border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; background: var(--bg); }
