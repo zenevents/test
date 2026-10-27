@@ -114,7 +114,7 @@
       <div class="infos">
         <div class="info">
           <h3>Prix</h3>
-          <p>Plat de la semaine <strong>CHF 19</strong> ; curry japonais, japchae, laksa, gà façon « bì » et bún <strong>CHF 22</strong> (+1 CHF sans contenant).<br>
+          <p>Plat de la semaine <strong>CHF 19</strong> ; curry japonais, japchae, laksa, gà façon « bì » et bún <strong>CHF 22</strong> ; phở bò <strong>CHF 25</strong> (+1 CHF sans contenant).<br>
           Desserts <strong>CHF 6</strong> (+2 CHF de consigne)<br>
           Boissons <strong>CHF 4</strong> : PET, citronnade maison ou chai latte</p>
         </div>
@@ -187,7 +187,7 @@
 
   <script>
     // Chaque plat n'est décrit qu'une fois ici ; le pad thaï est toujours présenté en premier.
-    // Prix : CHF 19 par défaut ; indiquer price pour les plats à CHF 22 (curry japonais, japchae, laksa, gà façon bì, bún).
+    // Prix : CHF 19 par défaut ; indiquer price pour les autres (CHF 22 : curry japonais, japchae, laksa, gà façon bì, bún ; CHF 25 : phở bò).
     const DEFAULT_PRICE = "CHF 19";
     const dishes = {
       padthai: {
@@ -223,6 +223,12 @@
         price: "CHF 22",
         desc: "Voici un plat très populaire à Hô-Chi-Minh-Ville (Saïgon). Au fond, une salade de concombre, carottes vinaigrées et menthe. Par-dessus, du riz à l'huile d'oignons de printemps, du poulet suisse et/ou du tofu délicatement parfumé à la poudre de riz grillé. Le tout arrosé de sauce citronnée.",
         allergens: "Allergènes dans le plat : ail, sauce d'huîtres et sauce de poisson. Servis à part : coriandre, piment."
+      },
+      pho: {
+        name: "Phở bò",
+        price: "CHF 25",
+        desc: "Voici le plat national vietnamien et le bouillon bienfaisant de l'hiver qui réchauffe, nourrit la flore intestinale, apporte des minéraux, des oligo-éléments et des vitamines… Des nouilles de riz, des pousses de soja, des oignons de printemps, du bœuf et du rumpsteak suisses. Le bouillon de bœuf et d'épices (anis étoilé, clous de girofle, poivre noir, cannelle) mijote 5 heures.",
+        allergens: "Servis à part : coriandre, piment."
       },
       bun: {
         name: "Bún gà ou bún tofu",
