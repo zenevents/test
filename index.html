@@ -114,7 +114,7 @@
       <div class="infos">
         <div class="info">
           <h3>Prix</h3>
-          <p>Plat de la semaine <strong>CHF 19</strong> ; curry japonais, japchae, laksa et bún <strong>CHF 22</strong> (+1 CHF sans contenant).<br>
+          <p>Plat de la semaine <strong>CHF 19</strong> ; curry japonais, japchae, laksa, gà façon « bì » et bún <strong>CHF 22</strong> (+1 CHF sans contenant).<br>
           Desserts <strong>CHF 6</strong> (+2 CHF de consigne)<br>
           Boissons <strong>CHF 4</strong> : PET, citronnade maison ou chai latte</p>
         </div>
@@ -187,7 +187,7 @@
 
   <script>
     // Chaque plat n'est décrit qu'une fois ici ; le pad thaï est toujours présenté en premier.
-    // Prix : CHF 19 par défaut ; indiquer price pour les plats à CHF 22 (curry japonais, japchae, laksa, bún).
+    // Prix : CHF 19 par défaut ; indiquer price pour les plats à CHF 22 (curry japonais, japchae, laksa, gà façon bì, bún).
     const DEFAULT_PRICE = "CHF 19";
     const dishes = {
       padthai: {
@@ -218,6 +218,12 @@
         price: "CHF 22",
         desc: "La laksa est une soupe asiatique de nouilles épicées, principalement consommée en Malaisie, en Indonésie et à Singapour. C'est une soupe riche et complète à base de lait de coco, de nouilles de riz, de carottes, de pommes de terre, de poulet ou de tofu, parfumée à la pâte de curry.",
         allergens: "Allergènes dans le plat : ail, sauce de poisson. Servis à part : coriandre, piment."
+      },
+      gabi: {
+        name: "Gà façon « bì »",
+        price: "CHF 22",
+        desc: "Voici un plat très populaire à Hô-Chi-Minh-Ville (Saïgon). Au fond, une salade de concombre, carottes vinaigrées et menthe. Par-dessus, du riz à l'huile d'oignons de printemps, du poulet suisse et/ou du tofu délicatement parfumé à la poudre de riz grillé. Le tout arrosé de sauce citronnée.",
+        allergens: "Allergènes dans le plat : ail, sauce d'huîtres et sauce de poisson. Servis à part : coriandre, piment."
       },
       bun:     { name: "Bún", price: "CHF 22", desc: "", allergens: "" }
     };
