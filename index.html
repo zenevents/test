@@ -113,7 +113,7 @@
       <div class="infos">
         <div class="info">
           <h3>Prix</h3>
-          <p>Plat de la semaine : voir le menu (+1 CHF sans contenant).<br>
+          <p>Plat de la semaine <strong>CHF 19</strong> ; curry japonais, japchae et bún <strong>CHF 22</strong> (+1 CHF sans contenant).<br>
           Desserts <strong>CHF 6</strong> (+2 CHF de consigne)<br>
           Boissons <strong>CHF 4</strong> : PET, citronnade maison ou chai latte</p>
         </div>
@@ -186,6 +186,8 @@
 
   <script>
     // Chaque plat n'est décrit qu'une fois ici ; le pad thaï est toujours présenté en premier.
+    // Prix : CHF 19 par défaut ; indiquer price pour les plats à CHF 22 (curry japonais, japchae, bún).
+    const DEFAULT_PRICE = "CHF 19";
     const dishes = {
       padthai: {
         name: "Pad thaï au poulet suisse et/ou tofu bio",
@@ -199,19 +201,24 @@
       },
       curry: {
         name: "Curry japonais",
+        price: "CHF 22",
         desc: "Le curry japonais est plus doux que son cousin indien. Très prisé au Japon, il est moins relevé et plus épais que le curry d'Inde, et ses ingrédients incontournables sont les carottes, les pommes de terre et l'oignon.",
         allergens: "Servi à part : piment."
-      }
+      },
+      // Descriptions à compléter avant de programmer ces plats.
+      japchae: { name: "Japchae", price: "CHF 22", desc: "", allergens: "" },
+      bun:     { name: "Bún", price: "CHF 22", desc: "", allergens: "" }
     };
+    const priceOf = k => dishes[k].price || DEFAULT_PRICE;
 
     // Programme : chaque semaine va du lundi (start) au vendredi (end).
     // Pour mettre à jour le menu, il suffit de modifier cette liste.
     const weeks = [
-      { start: "2026-10-26", end: "2026-10-30", label: "26–30 oct", dish: "padthai", price: "CHF 19" },
-      { start: "2026-11-02", end: "2026-11-06", label: "2–6 nov",   dish: "krapao",  price: "CHF 19" },
-      { start: "2026-11-09", end: "2026-11-13", label: "9–13 nov",  dish: "padthai", price: "CHF 19" },
-      { start: "2026-11-16", end: "2026-11-20", label: "16–20 nov", dish: "curry",   price: "CHF 22" },
-      { start: "2026-11-23", end: "2026-11-27", label: "23–27 nov", dish: "padthai", price: "CHF 19" }
+      { start: "2026-10-26", end: "2026-10-30", label: "26–30 oct", dish: "padthai" },
+      { start: "2026-11-02", end: "2026-11-06", label: "2–6 nov",   dish: "krapao" },
+      { start: "2026-11-09", end: "2026-11-13", label: "9–13 nov",  dish: "padthai" },
+      { start: "2026-11-16", end: "2026-11-20", label: "16–20 nov", dish: "curry" },
+      { start: "2026-11-23", end: "2026-11-27", label: "23–27 nov", dish: "padthai" }
     ];
 
     const today = new Date();
@@ -226,7 +233,7 @@
     document.getElementById("programme").innerHTML = shown.map(w =>
       '<li' + (w === current ? ' class="now"' : '') + '><span class="d">' + esc(w.label) + '</span>' +
       '<span class="n">' + esc(dishes[w.dish].name) + (w === current ? ' <em>Cette semaine</em>' : '') + '</span>' +
-      '<span class="p">' + esc(w.price) + '</span></li>'
+      '<span class="p">' + esc(priceOf(w.dish)) + '</span></li>'
     ).join("") || '<li><span class="n">Le programme suivant arrive bientôt.</span></li>';
 
     // Une fiche par plat : le pad thaï d'abord, puis les autres dans l'ordre du programme.
@@ -237,8 +244,9 @@
       const isNow = current && current.dish === k;
       return '<article class="dish' + (isNow ? ' now' : '') + '">' +
         (isNow ? '<span class="when">Cette semaine</span>' : '') +
-        '<h4>' + esc(d.name) + '</h4><p>' + esc(d.desc) + '</p>' +
-        '<p class="allergens">' + esc(d.allergens) + '</p></article>';
+        '<h4>' + esc(d.name) + ' <span class="dish-price">' + esc(priceOf(k)) + '</span></h4>' +
+        (d.desc ? '<p>' + esc(d.desc) + '</p>' : '') +
+        (d.allergens ? '<p class="allergens">' + esc(d.allergens) + '</p>' : '') + '</article>';
     }).join("");
 
     // Met en avant l'emplacement du jour.
