@@ -3,10 +3,185 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Test</title>
+  <title>Debi's Kitchen</title>
+  <meta name="description" content="Debi's Kitchen — une cuisine maison, généreuse et faite avec amour.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fbf6ef;
+      --paper: #ffffff;
+      --ink: #2d2420;
+      --muted: #75665d;
+      --accent: #c2553a;
+      --accent-dark: #9e3f28;
+      --sage: #7d8f69;
+      --line: #eadfd2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    h1, h2, h3 { font-family: "Fraunces", Georgia, serif; line-height: 1.15; }
+    a { color: inherit; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    /* Navigation */
+    nav { padding: 22px 0; }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .logo { font-family: "Fraunces", serif; font-weight: 700; font-size: 1.4rem; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    nav ul { display: flex; gap: 24px; list-style: none; }
+    nav ul a { text-decoration: none; color: var(--muted); font-weight: 500; }
+    nav ul a:hover { color: var(--accent); }
+
+    /* Accueil */
+    .hero { padding: 72px 0 96px; text-align: center; }
+    .tag {
+      display: inline-block; padding: 6px 14px; border-radius: 999px;
+      background: #f3e4d8; color: var(--accent-dark);
+      font-size: .85rem; font-weight: 500; margin-bottom: 22px;
+    }
+    .hero h1 { font-size: clamp(2.4rem, 7vw, 4.4rem); max-width: 14ch; margin: 0 auto 20px; }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero p { color: var(--muted); font-size: 1.15rem; max-width: 48ch; margin: 0 auto 34px; }
+    .btn {
+      display: inline-block; padding: 14px 28px; border-radius: 999px;
+      background: var(--accent); color: #fff; text-decoration: none; font-weight: 500;
+      transition: background .2s, transform .2s;
+    }
+    .btn:hover { background: var(--accent-dark); transform: translateY(-2px); }
+
+    /* Sections */
+    section { padding: 80px 0; }
+    .section-title { text-align: center; margin-bottom: 48px; }
+    .section-title h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 10px; }
+    .section-title p { color: var(--muted); }
+
+    .about { background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .about .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .plate {
+      aspect-ratio: 1; border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #fff 0 38%, transparent 38.5%),
+        radial-gradient(circle at 50% 50%, #f3e4d8 0 48%, transparent 48.5%),
+        radial-gradient(circle at 30% 30%, #e9b48f, var(--accent) 70%);
+      max-width: 380px; width: 100%; margin: 0 auto;
+      box-shadow: 0 30px 60px -30px rgba(158, 63, 40, .45);
+    }
+    .about h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin-bottom: 18px; }
+    .about p { color: var(--muted); margin-bottom: 14px; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .card {
+      background: var(--paper); border: 1px solid var(--line); border-radius: 18px;
+      padding: 32px 26px; transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -24px rgba(45, 36, 32, .35); }
+    .dot { width: 44px; height: 44px; border-radius: 50%; margin-bottom: 18px; }
+    .card:nth-child(1) .dot { background: var(--accent); }
+    .card:nth-child(2) .dot { background: var(--sage); }
+    .card:nth-child(3) .dot { background: #d9a441; }
+    .card h3 { font-size: 1.3rem; margin-bottom: 8px; }
+    .card p { color: var(--muted); }
+
+    .contact { text-align: center; }
+    .contact-box {
+      background: var(--ink); color: var(--cream); border-radius: 24px;
+      padding: 64px 28px;
+    }
+    .contact-box h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 12px; }
+    .contact-box p { color: #d8ccc2; margin-bottom: 30px; }
+
+    footer { padding: 32px 0 44px; text-align: center; color: var(--muted); font-size: .9rem; }
+
+    @media (max-width: 760px) {
+      nav ul { display: none; }
+      .hero { padding: 40px 0 64px; }
+      section { padding: 60px 0; }
+      .about .wrap { grid-template-columns: 1fr; gap: 36px; text-align: center; }
+      .plate { max-width: 240px; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Bonjour !</h1>
-  <p>Page de test.</p>
+
+  <nav>
+    <div class="wrap">
+      <a href="#" class="logo">Debi's <span>Kitchen</span></a>
+      <ul>
+        <li><a href="#apropos">À propos</a></li>
+        <li><a href="#cuisine">La cuisine</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <span class="tag">Fait maison, avec amour</span>
+      <h1>La cuisine qui fait <em>du bien</em></h1>
+      <p>Des plats généreux, des produits frais et des recettes qui sentent bon la maison.</p>
+      <a href="#contact" class="btn">Me contacter</a>
+    </div>
+  </header>
+
+  <section class="about" id="apropos">
+    <div class="wrap">
+      <div class="plate" aria-hidden="true"></div>
+      <div>
+        <h2>Bienvenue chez Debi</h2>
+        <p>Chez Debi's Kitchen, chaque plat commence par de bons ingrédients et beaucoup de passion.</p>
+        <p>[Raconte ici ton histoire : comment tout a commencé, ce qui t'inspire, ce qui rend ta cuisine unique.]</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="cuisine">
+    <div class="wrap">
+      <div class="section-title">
+        <h2>Ce que je propose</h2>
+        <p>[Adapte ces trois blocs à ton activité.]</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="dot"></div>
+          <h3>Plats maison</h3>
+          <p>Des recettes réconfortantes, préparées comme à la maison.</p>
+        </div>
+        <div class="card">
+          <div class="dot"></div>
+          <h3>Produits frais</h3>
+          <p>Des ingrédients choisis avec soin, de saison autant que possible.</p>
+        </div>
+        <div class="card">
+          <div class="dot"></div>
+          <h3>Douceurs</h3>
+          <p>Des desserts gourmands pour finir le repas en beauté.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="contact-box">
+        <h2>On se met à table ?</h2>
+        <p>Une question, une commande, un événement ? Écris-moi.</p>
+        <a href="mailto:contact@exemple.com" class="btn">contact@exemple.com</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Debi's Kitchen
+  </footer>
+
 </body>
 </html>
