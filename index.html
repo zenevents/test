@@ -206,7 +206,6 @@
         desc: "Le curry japonais est plus doux que son cousin indien. Très prisé au Japon, il est moins relevé et plus épais que le curry d'Inde, et ses ingrédients incontournables sont les carottes, les pommes de terre et l'oignon.",
         allergens: "Servi à part : piment."
       },
-      // Description à compléter avant de programmer ce plat.
       japchae: {
         name: "Japchae",
         price: "CHF 22",
@@ -225,7 +224,12 @@
         desc: "Voici un plat très populaire à Hô-Chi-Minh-Ville (Saïgon). Au fond, une salade de concombre, carottes vinaigrées et menthe. Par-dessus, du riz à l'huile d'oignons de printemps, du poulet suisse et/ou du tofu délicatement parfumé à la poudre de riz grillé. Le tout arrosé de sauce citronnée.",
         allergens: "Allergènes dans le plat : ail, sauce d'huîtres et sauce de poisson. Servis à part : coriandre, piment."
       },
-      bun:     { name: "Bún", price: "CHF 22", desc: "", allergens: "" }
+      bun: {
+        name: "Bún gà ou bún tofu",
+        price: "CHF 22",
+        desc: "Le bún gà, bún tofu ou bún mixte est un plat tiède vietnamien. Au fond : de la salade verte, du concombre, des carottes vinaigrées et de la menthe fraîche. Par-dessus, les bún, des nouilles de riz tièdes, puis du poulet suisse et/ou du tofu bio à la citronnelle. Le tout accompagné d'une sauce citronnée froide.",
+        allergens: "Allergènes dans le plat : ail, sauce d'huîtres et sauce de poisson. Servis à part : cacahuètes, coriandre, piment."
+      }
     };
     const priceOf = k => dishes[k].price || DEFAULT_PRICE;
 
