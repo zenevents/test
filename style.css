@@ -36,15 +36,10 @@ nav a { text-decoration: none; color: var(--muted); font-weight: 500; }
 nav a:hover { color: var(--green-dark); }
 
 /* Accueil */
-.hero {
-  min-height: min(78vh, 680px); display: flex; align-items: center;
-  padding: 80px 0; color: #fff;
-  /* Dégradé sombre à gauche pour que le texte reste lisible sur la photo */
-  background:
-    linear-gradient(90deg, rgba(20, 32, 18, .88) 0%, rgba(20, 32, 18, .65) 45%, rgba(20, 32, 18, .15) 100%),
-    url("images/varembe-coupe.png") center / cover no-repeat,
-    var(--green-dark);
-}
+/* Photo affichée en entier, sans recadrage ; limitée à 1280 px car l'original fait 1023 px de large */
+.hero-photo { background: var(--green-dark); }
+.hero-photo img { width: 100%; max-width: 1280px; margin: 0 auto; }
+.hero { padding: 56px 0 64px; color: #fff; background: var(--green-dark); }
 .hero .wrap { width: 100%; }
 .hero-text { max-width: 620px; }
 .badge {
@@ -204,13 +199,7 @@ footer a { color: var(--muted); }
   .contact-box { padding: 32px 22px; }
   .page-hero { padding: 44px 0 48px; }
   .banner { margin-top: -20px; }
-  .hero {
-    min-height: 0; padding: 56px 0;
-    background:
-      linear-gradient(180deg, rgba(20, 32, 18, .7) 0%, rgba(20, 32, 18, .88) 100%),
-      url("images/varembe-coupe.png") center / cover no-repeat,
-      var(--green-dark);
-  }
+  .hero { padding: 36px 0 48px; }
   .menu-grid, .cta { grid-template-columns: 1fr; }
   .cta { padding: 36px 24px; }
   section { padding: 56px 0; }
