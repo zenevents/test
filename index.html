@@ -202,6 +202,11 @@
         desc: "Cette spécialité thaïlandaise au goût incomparable et savoureuse au basilic thaï est servie avec du riz parfumé et du concombre.",
         allergens: "Allergènes : ail, sauce d'huîtres. Servis à part : coriandre, piment."
       },
+      satay: {
+        name: "Satay maison",
+        desc: "La sauce satay est onctueuse et faite maison avec de la citronnelle, des échalotes, des épices et du beurre de cacahuètes maison. Le plat est servi avec cette sauce, du riz parfumé et du poulet suisse et/ou tofu bio.",
+        allergens: "Allergènes : ail, sauce d'huîtres. Servis à part : coriandre, piment."
+      },
       curryvert: {
         name: "Curry vert",
         desc: "Parfumé et authentique : herbes fraîches et épices mélangées à du lait de coco onctueux. Une explosion thaïlandaise saine, végétalienne (tofu) et réconfortante.",
@@ -248,6 +253,9 @@
 
     // Programme : chaque semaine va du lundi (start) au vendredi (end).
     // Pour mettre à jour le menu, il suffit de modifier cette liste.
+    // Rotation habituelle (cycle de 6 semaines, puis on recommence) :
+    //   pad thaï → pad kra pao → pad thaï → satay → pad thaï → un plat à CHF 22
+    //   (curry japonais, japchae, laksa, gà façon bì ou bún ; phở bò à CHF 25 en hiver).
     const weeks = [
       { start: "2026-10-26", end: "2026-10-30", label: "26–30 oct", dish: "padthai" },
       { start: "2026-11-02", end: "2026-11-06", label: "2–6 nov",   dish: "krapao" },
