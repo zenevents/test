@@ -205,3 +205,6 @@ footer a { color: var(--muted); }
   section { padding: 56px 0; }
   .days { grid-template-columns: 1fr; }
 }
+
+/* Avis Google : le bloc reste masqué tant que le widget n’est pas collé */
+.reviews-widget:empty { display: none; }
