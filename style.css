@@ -197,8 +197,23 @@ footer a { color: var(--muted); }
   .days { grid-template-columns: 1fr; }
 }
 
-/* Avis Google : le bloc reste masqué tant que le widget n’est pas collé */
-.reviews-widget:empty { display: none; }
+/* Badge de note Google (chiffres mis à jour à la main) */
+.rating-badge {
+  display: inline-flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 20px 26px;
+  box-shadow: 0 14px 30px -22px rgba(31, 42, 29, .45); transition: transform .2s, box-shadow .2s;
+}
+.rating-badge:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -22px rgba(31, 42, 29, .55); }
+.rating-source { font-size: .85rem; font-weight: 600; color: var(--muted); }
+.rating-main { display: flex; align-items: center; gap: 12px; }
+.rating-score { font-family: "Bricolage Grotesque", sans-serif; font-size: 2.6rem; font-weight: 800; line-height: 1; }
+/* Étoiles remplies au prorata de la note : 4,7 / 5 = 94 % */
+.rating-stars {
+  font-size: 1.7rem; letter-spacing: 0; line-height: 1;
+  background: linear-gradient(90deg, #f4b400 calc(var(--rating) / 5 * 100%), #d9ddd5 0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.rating-count { font-size: .95rem; color: var(--green-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Programme et fiches des plats */
 .menu-sub { font-size: 1.15rem; font-weight: 800; color: var(--green-dark); margin-bottom: 8px; }
