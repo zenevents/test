@@ -33,7 +33,9 @@ Cycle de 6 semaines, puis on recommence :
 
 ## Produits
 
-- Poulet IP Suisse (Genève), certifié halal.
+- Poulet IP Suisse (Genève), certifié halal. Le mot « halal » (sous-titre du menu et bloc Origine) renvoie au certificat
+  `docs/certificat-halal-volailles-2026.pdf` (Mosquée de Lausanne pour Volailles Importations SA) :
+  à remplacer chaque année par le nouveau certificat (il est renouvelé d'année en année).
 - Tofu Bio Bourgeon.
 
 ## Contacts affichés
