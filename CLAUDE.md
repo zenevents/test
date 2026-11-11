@@ -15,12 +15,13 @@ Le pad thaï est toujours présenté en premier dans les fiches.
 
 ### Rotation des plats (règle donnée par Debi)
 
-Cycle de 6 semaines, puis on recommence :
+Cycle de 6 semaines, puis on recommence. Les 5 premières semaines sont toujours les mêmes,
+seule la 6e change :
 
 1. Pad thaï
-2. Pad kra pao
+2. Satay
 3. Pad thaï
-4. Satay
+4. Basilic (pad kra pao)
 5. Pad thaï
 6. Un plat à CHF 22 (curry japonais, japchae, laksa, gà façon « bì » ou bún ; le phở bò est à CHF 25)
 
