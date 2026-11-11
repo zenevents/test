@@ -11,7 +11,8 @@ Le programme et les plats sont dans le `<script>` de `index.html` :
 - `weeks` : le programme, une entrée par semaine (du lundi au vendredi).
 
 Seuls les plats inscrits dans `weeks` sont affichés ; les semaines passées disparaissent toutes seules.
-Le pad thaï est toujours présenté en premier dans les fiches.
+Les fiches du pad thaï, du satay et du basilic (pad kra pao) sont toujours affichées, dans cet ordre,
+même hors programme ; les autres plats n'apparaissent que lorsqu'ils sont programmés.
 
 ### Rotation des plats (règle donnée par Debi)
 
