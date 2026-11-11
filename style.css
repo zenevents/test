@@ -264,3 +264,4 @@ footer a { color: var(--muted); }
 }
 .upcoming li.closed .n { font-style: italic; color: var(--muted); }
 .upcoming li.closed.now .n { color: #fff; }
+.hero .hero-note { margin: 16px 0 0; font-size: .95rem; color: #cdeec5; }
