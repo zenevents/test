@@ -287,10 +287,11 @@
       '<span class="p">' + esc(priceOf(w.dish)) + '</span></li>'
     ).join("") || '<li><span class="n">Le programme suivant arrive bientôt.</span></li>';
 
-    // Une fiche par plat : pad thaï, satay et basilic sont toujours affichés (dans cet ordre),
-    // puis les autres plats programmés, dans l'ordre du programme.
-    const order = ["padthai", "satay", "krapao"];
+    // Une fiche par plat : le pad thaï d'abord, puis les plats dans l'ordre où ils seront servis.
+    // Le satay et le basilic sont toujours affichés, même s'ils ne sont pas au programme.
+    const order = ["padthai"];
     shown.forEach(w => { if (!order.includes(w.dish)) order.push(w.dish); });
+    ["satay", "krapao"].forEach(k => { if (!order.includes(k)) order.push(k); });
     document.getElementById("plats").innerHTML = order.map(k => {
       const d = dishes[k];
       const isNow = current && current.dish === k;
