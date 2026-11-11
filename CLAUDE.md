@@ -9,6 +9,7 @@ assemblage des adresses e-mail dans `site.js`. Pas d'étape de compilation.
 Le programme et les plats sont dans le `<script>` de `index.html` :
 - `dishes` : une fiche par plat (nom, description, allergènes, prix). Chaque plat n'est décrit qu'une fois.
 - `weeks` : le programme, une entrée par semaine (du lundi au vendredi).
+  Une fermeture s'écrit avec `closed` à la place de `dish` (ex. fêtes 2026 : 21 déc–8 janv, reprise le 11 janv 2027).
 
 Seuls les plats inscrits dans `weeks` sont affichés ; les semaines passées disparaissent toutes seules.
 Ordre des fiches : le pad thaï d'abord, puis les plats dans l'ordre où ils seront servis selon le programme.

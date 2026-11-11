@@ -258,6 +258,7 @@
 
     // Programme : chaque semaine va du lundi (start) au vendredi (end).
     // Pour mettre à jour le menu, il suffit de modifier cette liste.
+    // Une fermeture s'écrit avec closed à la place de dish, par ex. closed: "Fermé pour les fêtes".
     // Rotation habituelle (cycle de 6 semaines, puis on recommence ; seule la 6e semaine change) :
     //   pad thaï → satay → pad thaï → basilic (pad kra pao) → pad thaï → un plat à CHF 22
     //   (curry japonais, japchae, laksa, gà façon bì ou bún ; phở bò à CHF 25 en hiver).
@@ -269,7 +270,9 @@
       { start: "2026-11-23", end: "2026-11-27", label: "23–27 nov", dish: "padthai" },
       { start: "2026-11-30", end: "2026-12-04", label: "30 nov–4 déc", dish: "satay" },
       { start: "2026-12-07", end: "2026-12-11", label: "7–11 déc",  dish: "padthai" },
-      { start: "2026-12-14", end: "2026-12-18", label: "14–18 déc", dish: "krapao" }
+      { start: "2026-12-14", end: "2026-12-18", label: "14–18 déc", dish: "krapao" },
+      { start: "2026-12-21", end: "2027-01-08", label: "21 déc–8 janv", closed: "Fermé pour les fêtes" },
+      { start: "2027-01-11", end: "2027-01-15", label: "11–15 janv", dish: "padthai" }
     ];
 
     const today = new Date();
@@ -282,15 +285,15 @@
     const current = shown.find(w => t >= w.start);
 
     document.getElementById("programme").innerHTML = shown.map(w =>
-      '<li' + (w === current ? ' class="now"' : '') + '><span class="d">' + esc(w.label) + '</span>' +
-      '<span class="n">' + esc(dishes[w.dish].name) + (w === current ? ' <em>Cette semaine</em>' : '') + '</span>' +
-      '<span class="p">' + esc(priceOf(w.dish)) + '</span></li>'
+      '<li class="' + (w === current ? 'now' : '') + (w.closed ? ' closed' : '') + '"><span class="d">' + esc(w.label) + '</span>' +
+      '<span class="n">' + esc(w.closed || dishes[w.dish].name) + (w === current ? ' <em>' + (w.closed ? 'En ce moment' : 'Cette semaine') + '</em>' : '') + '</span>' +
+      '<span class="p">' + (w.closed ? '' : esc(priceOf(w.dish))) + '</span></li>'
     ).join("") || '<li><span class="n">Le programme suivant arrive bientôt.</span></li>';
 
     // Une fiche par plat : le pad thaï d'abord, puis les plats dans l'ordre où ils seront servis.
     // Le satay et le basilic sont toujours affichés, même s'ils ne sont pas au programme.
     const order = ["padthai"];
-    shown.forEach(w => { if (!order.includes(w.dish)) order.push(w.dish); });
+    shown.forEach(w => { if (w.dish && !order.includes(w.dish)) order.push(w.dish); });
     ["satay", "krapao"].forEach(k => { if (!order.includes(k)) order.push(k); });
     document.getElementById("plats").innerHTML = order.map(k => {
       const d = dishes[k];
