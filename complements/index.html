@@ -80,6 +80,7 @@
       <button class="danger" id="clear">Tout effacer</button>
     </div>
     <div class="msg" id="msg"></div>
+    <div class="msg" id="saved"></div>
   </div>
 
   <div class="panel">
@@ -119,7 +120,7 @@
 
   <p class="legend">
     <span style="background:#f3f6ff;border:1px solid #c9d6ff"></span>bleu = à saisir ·
-    <span style="background:var(--pink)"></span>rose = pot ouvert plus léger que pot vide + sachet : remesurer (compté comme 0 cp) ·
+    <span style="background:var(--pink)"></span>rose = pot ouvert plus léger que pot vide + sachet (1,50 g) : remesurer (compté comme 0 cp) ·
     <span style="background:var(--yellow)"></span>jaune = information manquante empêchant le calcul
   </p>
 </div>
@@ -130,8 +131,8 @@
   var FIELDS = ["num", "name", "cap", "perDay", "boxes", "left", "empty", "unit", "opened", "note"];
   var NUMERIC = { num: 1, cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, opened: 1 };
   var WEIGH = { empty: 1, unit: 1, opened: 1 };
-  // Chaque pot contient toujours un sachet de gel de 1,35 g, retiré du poids du pot ouvert.
-  var GEL = 1.35;
+  // Chaque pot contient toujours un sachet de gel de 1,50 g, retiré du poids du pot ouvert.
+  var GEL = 1.5;
   var state = { rows: [], months: 3, weigh: false };
 
   function num(v) {
@@ -147,7 +148,17 @@
     var to = new Date(from); to.setMonth(to.getMonth() + (+state.months || 3)); to.setDate(to.getDate() - 1);
     return { from: from, to: to, days: Math.round((to - from) / 86400000) + 1 };
   }
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+  function save() {
+    var el = document.getElementById("saved");
+    try {
+      localStorage.setItem(STORE, JSON.stringify(state));
+      el.textContent = "✓ Enregistré automatiquement à " + new Date().toLocaleTimeString("fr-CH", { hour: "2-digit", minute: "2-digit" });
+      el.style.color = "#2b7a3d";
+    } catch (e) {
+      el.textContent = "⚠ Impossible d'enregistrer dans ce navigateur (navigation privée ?) : exporte en Excel avant de fermer.";
+      el.style.color = "var(--buy)";
+    }
+  }
   function load() {
     try { var s = JSON.parse(localStorage.getItem(STORE)); if (s && s.rows) state = s; } catch (e) {}
     if (!state.months) state.months = 3;
@@ -162,8 +173,8 @@
       var net = opened - GEL - empty;
       return { n: Math.max(0, Math.round(net / unit)), pink: net < 0, weighed: true };
     }
-    if (r.noOpened) return { n: 0, pink: false, weighed: false };
-    return { n: null, pink: false, weighed: false };
+    // Pas de pot ouvert saisi (ni nombre, ni poids) : on compte 0 comprimé restant.
+    return { n: 0, pink: false, weighed: false };
   }
   function compute(r, days) {
     var cap = num(r.cap), per = num(r.perDay), boxes = num(r.boxes) || 0, L = leftOf(r);
@@ -225,7 +236,6 @@
     var t = e.target; if (!t.dataset.f) return;
     var r = state.rows[+t.dataset.i];
     r[t.dataset.f] = t.value;
-    if (WEIGH[t.dataset.f] || t.dataset.f === "left") r.noOpened = false;
     save();
     // Recalcule sans perdre le curseur : on ne remplace que les cellules calculées.
     var pos = t.selectionStart, f = t.dataset.f, i = t.dataset.i;
@@ -271,9 +281,6 @@
         FIELDS.forEach(function (f) { if (col[f] !== undefined) r[f] = g[col[f]] === null ? "" : g[col[f]]; });
         // Ignore les lignes de commentaire (ex. « Période : … » en bas d'un export) : ni capacité ni besoin.
         if (num(r.cap) === null && num(r.perDay) === null) continue;
-        // Pas de pot entamé mesuré mais stock confirmé à 0 dans le fichier : 0 cp restant.
-        var leftCol = grid[hi].findIndex(function (h) { return /^cp restants/i.test(String(h || "")); });
-        if (r.opened === "" && r.empty === "" && r.unit === "" && leftCol >= 0 && g[leftCol] === 0) r.noOpened = true;
         rows.push(r);
       }
       state.rows = rows;
