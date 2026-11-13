@@ -10,7 +10,7 @@
   <style>
     :root {
       --bg: #f6f7f9; --paper: #fff; --ink: #1d2430; --muted: #5d6675; --line: #dfe3ea;
-      --accent: #2f5fd0; --pink: #fde2ea; --yellow: #fff4c2; --green: #e3f4e6; --buy: #b42318;
+      --accent: #2f5fd0; --yellow: #fff4c2; --green: #e3f4e6; --buy: #b42318;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); line-height: 1.45; }
@@ -40,12 +40,11 @@
     th.stock { background: #ffe2a8; color: #7a4b00; }
     td.stock { background: #fff3d6; }
     td.stock input { width: 84px; background: #fff; border: 2px solid #f0b54a; color: var(--ink); font-weight: 600; }
-    tr.pink td.stock, tr.yellow td.stock { background: #fff3d6; }
+    tr.yellow td.stock { background: #fff3d6; }
     td input:focus { outline: none; border-color: var(--accent); background: #fff; }
     td.calc { color: var(--ink); }
     td.buy { font-weight: 800; color: var(--buy); font-size: 1rem; }
     td.buy.zero { color: #2b7a3d; font-weight: 600; }
-    tr.pink td { background: var(--pink); }
     tr.yellow td { background: var(--yellow); }
     .del { border: 0; background: none; color: #999; padding: 2px 6px; }
     select { font: inherit; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
@@ -124,8 +123,8 @@
   </div>
 
   <p class="legend">
-    <span style="background:#f3f6ff;border:1px solid #c9d6ff"></span>bleu = à saisir ·
-    <span style="background:var(--pink)"></span>rose = pot ouvert plus léger que pot vide + sachet (1,50 g) : remesurer (compté comme 0 cp) ·
+    <span style="background:#fff3d6;border:2px solid #f0b54a"></span>orange = stock à relever à chaque commande ·
+    <span style="background:#f3f6ff;border:1px solid #c9d6ff"></span>bleu = réglages ·
     <span style="background:var(--yellow)"></span>jaune = information manquante empêchant le calcul
   </p>
 </div>
@@ -175,20 +174,20 @@
   // Comprimés restants dans le pot ouvert : saisis à la main, sinon par pesée (formule du fichier Excel).
   function leftOf(r) {
     var manual = num(r.left);
-    if (manual !== null) return { n: manual, pink: false, weighed: false };
+    if (manual !== null) return { n: manual, weighed: false };
     var empty = num(r.empty), unit = num(r.unit), opened = num(r.opened);
     if (opened !== null && empty !== null && unit) {
       var net = opened - GEL - empty;
-      return { n: Math.max(0, Math.round(net / unit)), pink: net < 0, weighed: true };
+      return { n: Math.max(0, Math.round(net / unit)), weighed: true };
     }
     // Poids saisi mais réglages de pesée incomplets : impossible de calculer.
-    if (opened !== null) return { n: null, pink: false, weighed: false };
+    if (opened !== null) return { n: null, weighed: false };
     // Pas de pot ouvert saisi (ni nombre, ni poids) : on compte 0 comprimé restant.
-    return { n: 0, pink: false, weighed: false };
+    return { n: 0, weighed: false };
   }
   function compute(r, days) {
     var cap = num(r.cap), per = num(r.perDay), boxes = num(r.boxes) || 0, L = leftOf(r);
-    var out = { left: L.n, weighed: L.weighed, pink: L.pink, total: null, need: null, buy: null };
+    var out = { left: L.n, weighed: L.weighed, total: null, need: null, buy: null };
     if (L.n !== null && cap !== null) out.total = L.n + boxes * cap;
     if (per !== null) out.need = per * days;
     if (out.total !== null && out.need !== null && cap) out.buy = Math.max(0, Math.ceil((out.need - out.total) / cap));
@@ -215,7 +214,7 @@
       var c = compute(r, days);
       // Si le pot ouvert est calculé par pesée, le résultat s'affiche en gris dans la case (on peut l'écraser).
       var ph = c.weighed ? String(c.left) : "";
-      html += '<tr class="' + (c.yellow ? "yellow" : c.pink ? "pink" : "") + '">' +
+      html += '<tr class="' + (c.yellow ? "yellow" : "") + '">' +
         cell(r, i, "num") + cell(r, i, "name") + cell(r, i, "boxes") + cell(r, i, "opened") + cell(r, i, "left", ph) + cell(r, i, "cap") + cell(r, i, "perDay") +
         cell(r, i, "empty") + cell(r, i, "unit") +
         '<td class="calc">' + show(c.total) + "</td>" +
