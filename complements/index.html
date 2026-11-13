@@ -35,6 +35,7 @@
     td.name, th.name { text-align: left; }
     td input { width: 72px; padding: 4px 5px; border: 1px solid transparent; border-radius: 6px; text-align: right; background: #f3f6ff; color: var(--accent); }
     td.name input { width: 190px; text-align: left; }
+    td.num input { width: 44px; }
     td.note input { width: 260px; text-align: left; color: var(--muted); background: #f7f7f7; }
     td input:focus { outline: none; border-color: var(--accent); background: #fff; }
     td.calc { color: var(--ink); }
@@ -97,6 +98,7 @@
     <table>
       <thead>
         <tr>
+          <th class="in">N°</th>
           <th class="in name">Complément</th>
           <th class="in">Cp par boîte</th>
           <th class="in">Cp par jour</th>
@@ -127,8 +129,8 @@
 <script>
   var STORE = "complements-v1";
   // Champs saisis. « left » = comprimés restants tapés à la main ; sinon calculés par pesée.
-  var FIELDS = ["name", "cap", "perDay", "boxes", "left", "empty", "unit", "gel", "opened", "note"];
-  var NUMERIC = { cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, gel: 1, opened: 1 };
+  var FIELDS = ["num", "name", "cap", "perDay", "boxes", "left", "empty", "unit", "gel", "opened", "note"];
+  var NUMERIC = { num: 1, cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, gel: 1, opened: 1 };
   var WEIGH = { empty: 1, unit: 1, gel: 1, opened: 1 };
   var state = { rows: [], months: 3, gel: false, weigh: false };
 
@@ -173,7 +175,7 @@
   }
 
   function cell(r, i, f, placeholder) {
-    var cls = (f === "name" ? "name" : f === "note" ? "note" : "") + (WEIGH[f] ? " w" : "");
+    var cls = (f === "name" ? "name" : f === "note" ? "note" : f === "num" ? "num" : "") + (WEIGH[f] ? " w" : "");
     var v = r[f] === null || r[f] === undefined ? "" : r[f];
     return '<td class="' + cls + '"><input data-i="' + i + '" data-f="' + f + '" value="' + String(v).replace(/"/g, "&quot;") + '"' +
       (NUMERIC[f] ? ' inputmode="decimal"' : "") + (placeholder !== undefined ? ' class="auto" placeholder="' + placeholder + '"' : "") + "></td>";
@@ -193,18 +195,19 @@
       // Si le pot ouvert est calculé par pesée, le résultat s'affiche en gris dans la case (on peut l'écraser).
       var ph = c.weighed ? String(c.left) : "";
       html += '<tr class="' + (c.yellow ? "yellow" : c.pink ? "pink" : "") + '">' +
-        cell(r, i, "name") + cell(r, i, "cap") + cell(r, i, "perDay") + cell(r, i, "boxes") + cell(r, i, "left", ph) +
+        cell(r, i, "num") + cell(r, i, "name") + cell(r, i, "cap") + cell(r, i, "perDay") + cell(r, i, "boxes") + cell(r, i, "left", ph) +
         cell(r, i, "empty") + cell(r, i, "unit") + cell(r, i, "gel") + cell(r, i, "opened") +
         '<td class="calc">' + show(c.total) + "</td>" +
         '<td class="calc">' + show(c.need) + "</td>" +
         '<td class="buy' + (c.buy === 0 ? " zero" : "") + '">' + (c.buy === null ? "info manquante" : c.buy) + "</td>" +
         cell(r, i, "note") +
         '<td class="no-print"><button class="del" data-del="' + i + '" title="Supprimer">✕</button></td></tr>';
-      if (c.buy) items.push(c.buy + " × " + (r.name || "Sans nom"));
-      else if (c.buy === null && r.name) items.push("? × " + r.name + " (info manquante)");
+      var label = (num(r.num) !== null ? "N° " + r.num + " – " : "") + (r.name || "Sans nom");
+      if (c.buy) items.push(c.buy + " × " + label);
+      else if (c.buy === null && r.name) items.push("? × " + label + " (info manquante)");
     });
     document.getElementById("rows").innerHTML = html ||
-      '<tr><td colspan="14" style="text-align:center;padding:24px;color:var(--muted)">Importe ton fichier Excel ou ajoute un complément.</td></tr>';
+      '<tr><td colspan="15" style="text-align:center;padding:24px;color:var(--muted)">Importe ton fichier Excel ou ajoute un complément.</td></tr>';
     var o = document.getElementById("order");
     o.innerHTML = !state.rows.length ? "" : items.length
       ? "<h2>Ma commande pour " + state.months + " mois</h2><ul>" + items.map(function (t) { return "<li>" + t.replace(/</g, "&lt;") + "</li>"; }).join("") +
@@ -245,7 +248,7 @@
 
   // Import : reconnaît les colonnes par leur titre (fichier « complements_achats.xlsx »).
   var HEADERS = {
-    name: /^article/i, cap: /^capacit/i, perDay: /^besoin\s*\/\s*jour/i, empty: /^poids vide/i,
+    num: /^(n°|no\.?|num)/i, name: /^article/i, cap: /^capacit/i, perDay: /^besoin\s*\/\s*jour/i, empty: /^poids vide/i,
     unit: /^poids 1 cp/i, gel: /^sachet gel/i, opened: /^poids entam/i, boxes: /^bo[iî]tes neuves/i, note: /^notes?/i
   };
   document.getElementById("file").addEventListener("change", function (e) {
@@ -267,6 +270,8 @@
         if (!name || typeof name !== "string") continue;
         var r = {};
         FIELDS.forEach(function (f) { if (col[f] !== undefined) r[f] = g[col[f]] === null ? "" : g[col[f]]; });
+        // Ignore les lignes de commentaire (ex. « Période : … » en bas d'un export) : ni capacité ni besoin.
+        if (num(r.cap) === null && num(r.perDay) === null) continue;
         // Pas de pot entamé mesuré mais stock confirmé à 0 dans le fichier : 0 cp restant.
         var leftCol = grid[hi].findIndex(function (h) { return /^cp restants/i.test(String(h || "")); });
         if (r.opened === "" && r.empty === "" && r.unit === "" && leftCol >= 0 && g[leftCol] === 0) r.noOpened = true;
@@ -286,12 +291,12 @@
   // Export : valeurs saisies + résultats, prêt à rouvrir dans Excel.
   document.getElementById("export").addEventListener("click", function () {
     var P = period();
-    var head = ["Article", "Capacité (cp/boîte)", "Besoin/jour (A)", "Poids vide B (g)", "Poids 1 cp C (g)", "Sachet gel D (g)",
+    var head = ["N°", "Article", "Capacité (cp/boîte)", "Besoin/jour (A)", "Poids vide B (g)", "Poids 1 cp C (g)", "Sachet gel D (g)",
       "Poids entamé E (g)", "Boîtes neuves en stock (F)", "Cp restants (ouvert)", "Total cp disponibles",
       "Besoin sur la période (" + P.days + " j)", "Boîtes à acheter", "Notes"];
     var data = [head].concat(state.rows.map(function (r) {
       var c = compute(r, P.days);
-      return [r.name, num(r.cap), num(r.perDay), num(r.empty), num(r.unit), num(r.gel), num(r.opened), num(r.boxes),
+      return [num(r.num), r.name, num(r.cap), num(r.perDay), num(r.empty), num(r.unit), num(r.gel), num(r.opened), num(r.boxes),
         c.left, c.total, c.need, c.buy === null ? "info manquante" : c.buy, r.note || ""];
     }));
     data.push([], ["Période : du " + iso(P.from) + " au " + iso(P.to) + " inclus", P.days + " jours"]);
