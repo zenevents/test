@@ -50,7 +50,7 @@
     .order ul { margin: 0 0 10px; padding-left: 1.2em; }
     .order li { margin: 3px 0; }
     .order .none { color: #2b7a3d; font-weight: 600; }
-    body:not(.weigh) .w, body:not(.weigh) #gelwrap { display: none; }
+    body:not(.weigh) .w { display: none; }
     td input.auto::placeholder { color: #8a97b5; }
     .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .chip { background: #fbe9e7; color: var(--buy); border-radius: 999px; padding: 4px 12px; font-weight: 600; font-size: .9rem; }
@@ -89,7 +89,6 @@
       </label>
       <div class="f" style="font-size:.85rem;color:var(--muted)">Période <span class="days" id="days" style="display:block">–</span></div>
       <label class="check no-print"><input type="checkbox" id="weigh"> Calculer le pot ouvert avec la balance</label>
-      <label class="check no-print" id="gelwrap"><input type="checkbox" id="gel"> Soustraire le sachet gel</label>
     </div>
     <div class="order" id="order"></div>
   </div>
@@ -104,9 +103,8 @@
           <th class="in">Cp par jour</th>
           <th class="in">Boîtes neuves en stock</th>
           <th class="in">Cp restants dans le pot ouvert</th>
-          <th class="in w">Poids pot vide (g)</th>
+          <th class="in w">Poids pot vide, sans sachet (g)</th>
           <th class="in w">Poids 1 cp (g)</th>
-          <th class="in w">Sachet gel (g)</th>
           <th class="in w">Poids pot ouvert (g)</th>
           <th>Total disponible (cp)</th>
           <th>Besoin sur la période (cp)</th>
@@ -121,7 +119,7 @@
 
   <p class="legend">
     <span style="background:#f3f6ff;border:1px solid #c9d6ff"></span>bleu = à saisir ·
-    <span style="background:var(--pink)"></span>rose = pot ouvert plus léger que le pot vide : remesurer (compté comme 0 cp) ·
+    <span style="background:var(--pink)"></span>rose = pot ouvert plus léger que pot vide + sachet : remesurer (compté comme 0 cp) ·
     <span style="background:var(--yellow)"></span>jaune = information manquante empêchant le calcul
   </p>
 </div>
@@ -129,10 +127,12 @@
 <script>
   var STORE = "complements-v1";
   // Champs saisis. « left » = comprimés restants tapés à la main ; sinon calculés par pesée.
-  var FIELDS = ["num", "name", "cap", "perDay", "boxes", "left", "empty", "unit", "gel", "opened", "note"];
-  var NUMERIC = { num: 1, cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, gel: 1, opened: 1 };
-  var WEIGH = { empty: 1, unit: 1, gel: 1, opened: 1 };
-  var state = { rows: [], months: 3, gel: false, weigh: false };
+  var FIELDS = ["num", "name", "cap", "perDay", "boxes", "left", "empty", "unit", "opened", "note"];
+  var NUMERIC = { num: 1, cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, opened: 1 };
+  var WEIGH = { empty: 1, unit: 1, opened: 1 };
+  // Chaque pot contient toujours un sachet de gel de 1,35 g, retiré du poids du pot ouvert.
+  var GEL = 1.35;
+  var state = { rows: [], months: 3, weigh: false };
 
   function num(v) {
     if (v === null || v === undefined || v === "") return null;
@@ -157,9 +157,10 @@
   function leftOf(r) {
     var manual = num(r.left);
     if (manual !== null) return { n: manual, pink: false, weighed: false };
-    var empty = num(r.empty), unit = num(r.unit), opened = num(r.opened), gel = state.gel ? (num(r.gel) || 0) : 0;
+    var empty = num(r.empty), unit = num(r.unit), opened = num(r.opened);
     if (opened !== null && empty !== null && unit) {
-      return { n: Math.max(0, Math.round((opened - gel - empty) / unit)), pink: opened < empty, weighed: true };
+      var net = opened - GEL - empty;
+      return { n: Math.max(0, Math.round(net / unit)), pink: net < 0, weighed: true };
     }
     if (r.noOpened) return { n: 0, pink: false, weighed: false };
     return { n: null, pink: false, weighed: false };
@@ -186,7 +187,6 @@
     document.body.classList.toggle("weigh", !!state.weigh);
     document.getElementById("months").value = String(state.months);
     document.getElementById("weigh").checked = !!state.weigh;
-    document.getElementById("gel").checked = !!state.gel;
     var P = period(), days = P.days;
     document.getElementById("days").textContent = "du " + fr(P.from) + " au " + fr(P.to) + " (" + days + " jours)";
     var html = "", items = [];
@@ -196,7 +196,7 @@
       var ph = c.weighed ? String(c.left) : "";
       html += '<tr class="' + (c.yellow ? "yellow" : c.pink ? "pink" : "") + '">' +
         cell(r, i, "num") + cell(r, i, "name") + cell(r, i, "cap") + cell(r, i, "perDay") + cell(r, i, "boxes") + cell(r, i, "left", ph) +
-        cell(r, i, "empty") + cell(r, i, "unit") + cell(r, i, "gel") + cell(r, i, "opened") +
+        cell(r, i, "empty") + cell(r, i, "unit") + cell(r, i, "opened") +
         '<td class="calc">' + show(c.total) + "</td>" +
         '<td class="calc">' + show(c.need) + "</td>" +
         '<td class="buy' + (c.buy === 0 ? " zero" : "") + '">' + (c.buy === null ? "info manquante" : c.buy) + "</td>" +
@@ -239,7 +239,6 @@
   });
   document.getElementById("months").addEventListener("change", function (e) { state.months = +e.target.value; save(); render(); });
   document.getElementById("weigh").addEventListener("change", function (e) { state.weigh = e.target.checked; save(); render(); });
-  document.getElementById("gel").addEventListener("change", function (e) { state.gel = e.target.checked; save(); render(); });
   document.getElementById("add").addEventListener("click", function () { state.rows.push({ name: "" }); save(); render(); });
   document.getElementById("print").addEventListener("click", function () { window.print(); });
   document.getElementById("clear").addEventListener("click", function () {
@@ -249,7 +248,7 @@
   // Import : reconnaît les colonnes par leur titre (fichier « complements_achats.xlsx »).
   var HEADERS = {
     num: /^(n°|no\.?|num)/i, name: /^article/i, cap: /^capacit/i, perDay: /^besoin\s*\/\s*jour/i, empty: /^poids vide/i,
-    unit: /^poids 1 cp/i, gel: /^sachet gel/i, opened: /^poids entam/i, boxes: /^bo[iî]tes neuves/i, note: /^notes?/i
+    unit: /^poids 1 cp/i, opened: /^poids entam/i, boxes: /^bo[iî]tes neuves/i, note: /^notes?/i
   };
   document.getElementById("file").addEventListener("change", function (e) {
     var file = e.target.files[0]; if (!file) return;
@@ -291,12 +290,12 @@
   // Export : valeurs saisies + résultats, prêt à rouvrir dans Excel.
   document.getElementById("export").addEventListener("click", function () {
     var P = period();
-    var head = ["N°", "Article", "Capacité (cp/boîte)", "Besoin/jour (A)", "Poids vide B (g)", "Poids 1 cp C (g)", "Sachet gel D (g)",
+    var head = ["N°", "Article", "Capacité (cp/boîte)", "Besoin/jour (A)", "Poids vide B (g)", "Poids 1 cp C (g)",
       "Poids entamé E (g)", "Boîtes neuves en stock (F)", "Cp restants (ouvert)", "Total cp disponibles",
       "Besoin sur la période (" + P.days + " j)", "Boîtes à acheter", "Notes"];
     var data = [head].concat(state.rows.map(function (r) {
       var c = compute(r, P.days);
-      return [num(r.num), r.name, num(r.cap), num(r.perDay), num(r.empty), num(r.unit), num(r.gel), num(r.opened), num(r.boxes),
+      return [num(r.num), r.name, num(r.cap), num(r.perDay), num(r.empty), num(r.unit), num(r.opened), num(r.boxes),
         c.left, c.total, c.need, c.buy === null ? "info manquante" : c.buy, r.note || ""];
     }));
     data.push([], ["Période : du " + iso(P.from) + " au " + iso(P.to) + " inclus", P.days + " jours"]);
