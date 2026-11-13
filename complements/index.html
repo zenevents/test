@@ -37,6 +37,10 @@
     td.name input { width: 190px; text-align: left; }
     td.num input { width: 44px; }
     td.note input { width: 260px; text-align: left; color: var(--muted); background: #f7f7f7; }
+    th.stock { background: #ffe2a8; color: #7a4b00; }
+    td.stock { background: #fff3d6; }
+    td.stock input { width: 84px; background: #fff; border: 2px solid #f0b54a; color: var(--ink); font-weight: 600; }
+    tr.pink td.stock, tr.yellow td.stock { background: #fff3d6; }
     td input:focus { outline: none; border-color: var(--accent); background: #fff; }
     td.calc { color: var(--ink); }
     td.buy { font-weight: 800; color: var(--buy); font-size: 1rem; }
@@ -74,7 +78,8 @@
       <label class="f">Importer mon fichier Excel
         <input type="file" id="file" accept=".xlsx,.xls,.csv">
       </label>
-      <button class="primary" id="export">Exporter en Excel</button>
+      <button class="primary" id="newOrder">Nouvelle commande</button>
+      <button id="export">Exporter en Excel</button>
       <button id="add">+ Ajouter un complément</button>
       <button id="print">Imprimer</button>
       <button class="danger" id="clear">Tout effacer</button>
@@ -89,7 +94,7 @@
         <select id="months"><option value="1">1 mois</option><option value="2">2 mois</option><option value="3" selected>3 mois</option><option value="4">4 mois</option><option value="6">6 mois</option></select>
       </label>
       <div class="f" style="font-size:.85rem;color:var(--muted)">Période <span class="days" id="days" style="display:block">–</span></div>
-      <label class="check no-print"><input type="checkbox" id="weigh"> Calculer le pot ouvert avec la balance</label>
+      <label class="check no-print"><input type="checkbox" id="weigh"> Afficher les réglages de pesée (pot vide, poids d'1 cp)</label>
     </div>
     <div class="order" id="order"></div>
   </div>
@@ -100,13 +105,13 @@
         <tr>
           <th class="in">N°</th>
           <th class="in name">Complément</th>
+          <th class="in stock">Boîtes neuves en stock</th>
+          <th class="in stock">Poids pot ouvert (g)</th>
+          <th class="in">ou cp restants (sans balance)</th>
           <th class="in">Cp par boîte</th>
           <th class="in">Cp par jour</th>
-          <th class="in">Boîtes neuves en stock</th>
-          <th class="in">Cp restants dans le pot ouvert</th>
           <th class="in w">Poids pot vide, sans sachet (g)</th>
           <th class="in w">Poids 1 cp (g)</th>
-          <th class="in w">Poids pot ouvert (g)</th>
           <th>Total disponible (cp)</th>
           <th>Besoin sur la période (cp)</th>
           <th>Boîtes à commander</th>
@@ -130,7 +135,10 @@
   // Champs saisis. « left » = comprimés restants tapés à la main ; sinon calculés par pesée.
   var FIELDS = ["num", "name", "cap", "perDay", "boxes", "left", "empty", "unit", "opened", "note"];
   var NUMERIC = { num: 1, cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, opened: 1 };
-  var WEIGH = { empty: 1, unit: 1, opened: 1 };
+  // Réglages de pesée (fixes pour chaque complément), masquables.
+  var WEIGH = { empty: 1, unit: 1 };
+  // Relevés de stock à refaire à chaque commande : mis en évidence et effacés par « Nouvelle commande ».
+  var STOCK = { boxes: 1, opened: 1 };
   // Chaque pot contient toujours un sachet de gel de 1,50 g, retiré du poids du pot ouvert.
   var GEL = 1.5;
   var state = { rows: [], months: 3, weigh: false };
@@ -173,6 +181,8 @@
       var net = opened - GEL - empty;
       return { n: Math.max(0, Math.round(net / unit)), pink: net < 0, weighed: true };
     }
+    // Poids saisi mais réglages de pesée incomplets : impossible de calculer.
+    if (opened !== null) return { n: null, pink: false, weighed: false };
     // Pas de pot ouvert saisi (ni nombre, ni poids) : on compte 0 comprimé restant.
     return { n: 0, pink: false, weighed: false };
   }
@@ -187,7 +197,7 @@
   }
 
   function cell(r, i, f, placeholder) {
-    var cls = (f === "name" ? "name" : f === "note" ? "note" : f === "num" ? "num" : "") + (WEIGH[f] ? " w" : "");
+    var cls = (f === "name" ? "name" : f === "note" ? "note" : f === "num" ? "num" : "") + (WEIGH[f] ? " w" : "") + (STOCK[f] ? " stock" : "");
     var v = r[f] === null || r[f] === undefined ? "" : r[f];
     return '<td class="' + cls + '"><input data-i="' + i + '" data-f="' + f + '" value="' + String(v).replace(/"/g, "&quot;") + '"' +
       (NUMERIC[f] ? ' inputmode="decimal"' : "") + (placeholder !== undefined ? ' class="auto" placeholder="' + placeholder + '"' : "") + "></td>";
@@ -206,8 +216,8 @@
       // Si le pot ouvert est calculé par pesée, le résultat s'affiche en gris dans la case (on peut l'écraser).
       var ph = c.weighed ? String(c.left) : "";
       html += '<tr class="' + (c.yellow ? "yellow" : c.pink ? "pink" : "") + '">' +
-        cell(r, i, "num") + cell(r, i, "name") + cell(r, i, "cap") + cell(r, i, "perDay") + cell(r, i, "boxes") + cell(r, i, "left", ph) +
-        cell(r, i, "empty") + cell(r, i, "unit") + cell(r, i, "opened") +
+        cell(r, i, "num") + cell(r, i, "name") + cell(r, i, "boxes") + cell(r, i, "opened") + cell(r, i, "left", ph) + cell(r, i, "cap") + cell(r, i, "perDay") +
+        cell(r, i, "empty") + cell(r, i, "unit") +
         '<td class="calc">' + show(c.total) + "</td>" +
         '<td class="calc">' + show(c.need) + "</td>" +
         '<td class="buy' + (c.buy === 0 ? " zero" : "") + '">' + (c.buy === null ? "info manquante" : c.buy) + "</td>" +
@@ -243,6 +253,13 @@
     var again = document.querySelector('input[data-i="' + i + '"][data-f="' + f + '"]');
     if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (err) {} }
   });
+  // Entrée : passe à la même colonne de la ligne suivante (saisie rapide du stock, de haut en bas).
+  document.getElementById("rows").addEventListener("keydown", function (e) {
+    var t = e.target; if (e.key !== "Enter" || !t.dataset.f) return;
+    e.preventDefault();
+    var next = document.querySelector('input[data-i="' + (+t.dataset.i + 1) + '"][data-f="' + t.dataset.f + '"]');
+    if (next) { next.focus(); next.select(); }
+  });
   document.getElementById("rows").addEventListener("click", function (e) {
     var i = e.target.dataset.del; if (i === undefined) return;
     if (confirm("Supprimer « " + (state.rows[i].name || "cette ligne") + " » ?")) { state.rows.splice(+i, 1); save(); render(); }
@@ -250,6 +267,12 @@
   document.getElementById("months").addEventListener("change", function (e) { state.months = +e.target.value; save(); render(); });
   document.getElementById("weigh").addEventListener("change", function (e) { state.weigh = e.target.checked; save(); render(); });
   document.getElementById("add").addEventListener("click", function () { state.rows.push({ name: "" }); save(); render(); });
+  document.getElementById("newOrder").addEventListener("click", function () {
+    if (!confirm("Nouvelle commande : effacer les boîtes neuves, les poids des pots ouverts et les cp restants de tous les compléments ?\n\nLes réglages (cp par boîte, cp par jour, poids à vide…) sont conservés.")) return;
+    state.rows.forEach(function (r) { r.boxes = ""; r.opened = ""; r.left = ""; });
+    save(); render();
+    var first = document.querySelector('input[data-f="boxes"]'); if (first) first.focus();
+  });
   document.getElementById("print").addEventListener("click", function () { window.print(); });
   document.getElementById("clear").addEventListener("click", function () {
     if (confirm("Effacer toutes les données de ce navigateur ?")) { state.rows = []; save(); render(); }
