@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Page personnelle, sans lien avec le reste du site : ni menu, ni indexation. -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Compléments – calcul des achats</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7f9; --paper: #fff; --ink: #1d2430; --muted: #5d6675; --line: #dfe3ea;
+      --accent: #2f5fd0; --pink: #fde2ea; --yellow: #fff4c2; --green: #e3f4e6; --buy: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); line-height: 1.45; }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    .lead { color: var(--muted); margin: 0 0 20px; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; }
+    label.f { display: flex; flex-direction: column; font-size: .85rem; color: var(--muted); gap: 4px; }
+    input, button { font: inherit; }
+    input[type=date] { padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; }
+    .days { font-weight: 700; font-size: 1.1rem; color: var(--ink); }
+    button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+    button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    button.danger { color: var(--buy); }
+    .check { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+    .table-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+    table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+    th, td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: right; white-space: nowrap; }
+    th { background: #eef1f6; font-weight: 600; position: sticky; top: 0; text-align: center; white-space: normal; min-width: 70px; }
+    th.in { color: var(--accent); }
+    td.name, th.name { text-align: left; }
+    td input { width: 72px; padding: 4px 5px; border: 1px solid transparent; border-radius: 6px; text-align: right; background: #f3f6ff; color: var(--accent); }
+    td.name input { width: 190px; text-align: left; }
+    td.note input { width: 260px; text-align: left; color: var(--muted); background: #f7f7f7; }
+    td input:focus { outline: none; border-color: var(--accent); background: #fff; }
+    td.calc { color: var(--ink); }
+    td.buy { font-weight: 800; color: var(--buy); font-size: 1rem; }
+    td.buy.zero { color: #2b7a3d; font-weight: 600; }
+    tr.pink td { background: var(--pink); }
+    tr.yellow td { background: var(--yellow); }
+    .del { border: 0; background: none; color: #999; padding: 2px 6px; }
+    select { font: inherit; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .order { margin-top: 14px; }
+    .order h2 { font-size: 1.05rem; margin: 0 0 8px; }
+    .order ul { margin: 0 0 10px; padding-left: 1.2em; }
+    .order li { margin: 3px 0; }
+    .order .none { color: #2b7a3d; font-weight: 600; }
+    body:not(.weigh) .w, body:not(.weigh) #gelwrap { display: none; }
+    td input.auto::placeholder { color: #8a97b5; }
+    .summary { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { background: #fbe9e7; color: var(--buy); border-radius: 999px; padding: 4px 12px; font-weight: 600; font-size: .9rem; }
+    .legend { font-size: .85rem; color: var(--muted); }
+    .legend span { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+    .msg { font-size: .9rem; margin-top: 8px; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; }
+      td input { background: none; border: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mes compléments : quoi commander ?</h1>
+  <p class="lead">Les données saisies restent dans ce navigateur (elles ne sont envoyées nulle part). Pour les retrouver sur un autre appareil, exporte le fichier Excel puis importe-le là-bas.</p>
+
+  <div class="panel no-print">
+    <div class="row">
+      <label class="f">Importer mon fichier Excel
+        <input type="file" id="file" accept=".xlsx,.xls,.csv">
+      </label>
+      <button class="primary" id="export">Exporter en Excel</button>
+      <button id="add">+ Ajouter un complément</button>
+      <button id="print">Imprimer</button>
+      <button class="danger" id="clear">Tout effacer</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <label class="f">Commander pour
+        <select id="months"><option value="1">1 mois</option><option value="2">2 mois</option><option value="3" selected>3 mois</option><option value="4">4 mois</option><option value="6">6 mois</option></select>
+      </label>
+      <div class="f" style="font-size:.85rem;color:var(--muted)">Période <span class="days" id="days" style="display:block">–</span></div>
+      <label class="check no-print"><input type="checkbox" id="weigh"> Calculer le pot ouvert avec la balance</label>
+      <label class="check no-print" id="gelwrap"><input type="checkbox" id="gel"> Soustraire le sachet gel</label>
+    </div>
+    <div class="order" id="order"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="in name">Complément</th>
+          <th class="in">Cp par boîte</th>
+          <th class="in">Cp par jour</th>
+          <th class="in">Boîtes neuves en stock</th>
+          <th class="in">Cp restants dans le pot ouvert</th>
+          <th class="in w">Poids pot vide (g)</th>
+          <th class="in w">Poids 1 cp (g)</th>
+          <th class="in w">Sachet gel (g)</th>
+          <th class="in w">Poids pot ouvert (g)</th>
+          <th>Total disponible (cp)</th>
+          <th>Besoin sur la période (cp)</th>
+          <th>Boîtes à commander</th>
+          <th class="in name">Notes</th>
+          <th class="no-print"></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <p class="legend">
+    <span style="background:#f3f6ff;border:1px solid #c9d6ff"></span>bleu = à saisir ·
+    <span style="background:var(--pink)"></span>rose = pot ouvert plus léger que le pot vide : remesurer (compté comme 0 cp) ·
+    <span style="background:var(--yellow)"></span>jaune = information manquante empêchant le calcul
+  </p>
+</div>
+
+<script>
+  var STORE = "complements-v1";
+  // Champs saisis. « left » = comprimés restants tapés à la main ; sinon calculés par pesée.
+  var FIELDS = ["name", "cap", "perDay", "boxes", "left", "empty", "unit", "gel", "opened", "note"];
+  var NUMERIC = { cap: 1, perDay: 1, boxes: 1, left: 1, empty: 1, unit: 1, gel: 1, opened: 1 };
+  var WEIGH = { empty: 1, unit: 1, gel: 1, opened: 1 };
+  var state = { rows: [], months: 3, gel: false, weigh: false };
+
+  function num(v) {
+    if (v === null || v === undefined || v === "") return null;
+    var n = typeof v === "number" ? v : parseFloat(String(v).replace(",", ".").trim());
+    return isFinite(n) ? n : null;
+  }
+  function iso(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function fr(d) { return d.toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric" }); }
+  // Période : d'aujourd'hui (inclus) jusqu'à la veille du même jour, N mois plus tard.
+  function period() {
+    var from = new Date(); from.setHours(12, 0, 0, 0);
+    var to = new Date(from); to.setMonth(to.getMonth() + (+state.months || 3)); to.setDate(to.getDate() - 1);
+    return { from: from, to: to, days: Math.round((to - from) / 86400000) + 1 };
+  }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+  function load() {
+    try { var s = JSON.parse(localStorage.getItem(STORE)); if (s && s.rows) state = s; } catch (e) {}
+    if (!state.months) state.months = 3;
+  }
+
+  // Comprimés restants dans le pot ouvert : saisis à la main, sinon par pesée (formule du fichier Excel).
+  function leftOf(r) {
+    var manual = num(r.left);
+    if (manual !== null) return { n: manual, pink: false, weighed: false };
+    var empty = num(r.empty), unit = num(r.unit), opened = num(r.opened), gel = state.gel ? (num(r.gel) || 0) : 0;
+    if (opened !== null && empty !== null && unit) {
+      return { n: Math.max(0, Math.round((opened - gel - empty) / unit)), pink: opened < empty, weighed: true };
+    }
+    if (r.noOpened) return { n: 0, pink: false, weighed: false };
+    return { n: null, pink: false, weighed: false };
+  }
+  function compute(r, days) {
+    var cap = num(r.cap), per = num(r.perDay), boxes = num(r.boxes) || 0, L = leftOf(r);
+    var out = { left: L.n, weighed: L.weighed, pink: L.pink, total: null, need: null, buy: null };
+    if (L.n !== null && cap !== null) out.total = L.n + boxes * cap;
+    if (per !== null) out.need = per * days;
+    if (out.total !== null && out.need !== null && cap) out.buy = Math.max(0, Math.ceil((out.need - out.total) / cap));
+    out.yellow = out.buy === null;
+    return out;
+  }
+
+  function cell(r, i, f, placeholder) {
+    var cls = (f === "name" ? "name" : f === "note" ? "note" : "") + (WEIGH[f] ? " w" : "");
+    var v = r[f] === null || r[f] === undefined ? "" : r[f];
+    return '<td class="' + cls + '"><input data-i="' + i + '" data-f="' + f + '" value="' + String(v).replace(/"/g, "&quot;") + '"' +
+      (NUMERIC[f] ? ' inputmode="decimal"' : "") + (placeholder !== undefined ? ' class="auto" placeholder="' + placeholder + '"' : "") + "></td>";
+  }
+  function show(v) { return v === null ? "?" : v; }
+
+  function render() {
+    document.body.classList.toggle("weigh", !!state.weigh);
+    document.getElementById("months").value = String(state.months);
+    document.getElementById("weigh").checked = !!state.weigh;
+    document.getElementById("gel").checked = !!state.gel;
+    var P = period(), days = P.days;
+    document.getElementById("days").textContent = "du " + fr(P.from) + " au " + fr(P.to) + " (" + days + " jours)";
+    var html = "", items = [];
+    state.rows.forEach(function (r, i) {
+      var c = compute(r, days);
+      // Si le pot ouvert est calculé par pesée, le résultat s'affiche en gris dans la case (on peut l'écraser).
+      var ph = c.weighed ? String(c.left) : "";
+      html += '<tr class="' + (c.yellow ? "yellow" : c.pink ? "pink" : "") + '">' +
+        cell(r, i, "name") + cell(r, i, "cap") + cell(r, i, "perDay") + cell(r, i, "boxes") + cell(r, i, "left", ph) +
+        cell(r, i, "empty") + cell(r, i, "unit") + cell(r, i, "gel") + cell(r, i, "opened") +
+        '<td class="calc">' + show(c.total) + "</td>" +
+        '<td class="calc">' + show(c.need) + "</td>" +
+        '<td class="buy' + (c.buy === 0 ? " zero" : "") + '">' + (c.buy === null ? "info manquante" : c.buy) + "</td>" +
+        cell(r, i, "note") +
+        '<td class="no-print"><button class="del" data-del="' + i + '" title="Supprimer">✕</button></td></tr>';
+      if (c.buy) items.push(c.buy + " × " + (r.name || "Sans nom"));
+      else if (c.buy === null && r.name) items.push("? × " + r.name + " (info manquante)");
+    });
+    document.getElementById("rows").innerHTML = html ||
+      '<tr><td colspan="14" style="text-align:center;padding:24px;color:var(--muted)">Importe ton fichier Excel ou ajoute un complément.</td></tr>';
+    var o = document.getElementById("order");
+    o.innerHTML = !state.rows.length ? "" : items.length
+      ? "<h2>Ma commande pour " + state.months + " mois</h2><ul>" + items.map(function (t) { return "<li>" + t.replace(/</g, "&lt;") + "</li>"; }).join("") +
+        '</ul><button class="no-print" id="copy">Copier la commande</button> <span id="copied" class="legend"></span>'
+      : '<p class="none">Rien à commander : ton stock couvre les ' + state.months + " prochains mois.</p>";
+    var cp = document.getElementById("copy");
+    if (cp) cp.onclick = function () {
+      var text = "Commande compléments (" + state.months + " mois) :\n" + items.map(function (t) { return "- " + t; }).join("\n");
+      navigator.clipboard.writeText(text).then(function () { document.getElementById("copied").textContent = "✓ copiée"; },
+        function () { document.getElementById("copied").textContent = "copie impossible : sélectionne la liste à la main"; });
+    };
+  }
+
+  document.getElementById("rows").addEventListener("input", function (e) {
+    var t = e.target; if (!t.dataset.f) return;
+    var r = state.rows[+t.dataset.i];
+    r[t.dataset.f] = t.value;
+    if (WEIGH[t.dataset.f] || t.dataset.f === "left") r.noOpened = false;
+    save();
+    // Recalcule sans perdre le curseur : on ne remplace que les cellules calculées.
+    var pos = t.selectionStart, f = t.dataset.f, i = t.dataset.i;
+    render();
+    var again = document.querySelector('input[data-i="' + i + '"][data-f="' + f + '"]');
+    if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (err) {} }
+  });
+  document.getElementById("rows").addEventListener("click", function (e) {
+    var i = e.target.dataset.del; if (i === undefined) return;
+    if (confirm("Supprimer « " + (state.rows[i].name || "cette ligne") + " » ?")) { state.rows.splice(+i, 1); save(); render(); }
+  });
+  document.getElementById("months").addEventListener("change", function (e) { state.months = +e.target.value; save(); render(); });
+  document.getElementById("weigh").addEventListener("change", function (e) { state.weigh = e.target.checked; save(); render(); });
+  document.getElementById("gel").addEventListener("change", function (e) { state.gel = e.target.checked; save(); render(); });
+  document.getElementById("add").addEventListener("click", function () { state.rows.push({ name: "" }); save(); render(); });
+  document.getElementById("print").addEventListener("click", function () { window.print(); });
+  document.getElementById("clear").addEventListener("click", function () {
+    if (confirm("Effacer toutes les données de ce navigateur ?")) { state.rows = []; save(); render(); }
+  });
+
+  // Import : reconnaît les colonnes par leur titre (fichier « complements_achats.xlsx »).
+  var HEADERS = {
+    name: /^article/i, cap: /^capacit/i, perDay: /^besoin\s*\/\s*jour/i, empty: /^poids vide/i,
+    unit: /^poids 1 cp/i, gel: /^sachet gel/i, opened: /^poids entam/i, boxes: /^bo[iî]tes neuves/i, note: /^notes?/i
+  };
+  document.getElementById("file").addEventListener("change", function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    var msg = document.getElementById("msg");
+    file.arrayBuffer().then(function (buf) {
+      var wb = XLSX.read(buf, { type: "array" });
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var grid = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+      var hi = grid.findIndex(function (row) { return row.some(function (c) { return HEADERS.name.test(String(c || "")); }); });
+      if (hi < 0) throw new Error("colonne « Article » introuvable");
+      var col = {};
+      grid[hi].forEach(function (h, j) {
+        Object.keys(HEADERS).forEach(function (k) { if (col[k] === undefined && HEADERS[k].test(String(h || "").trim())) col[k] = j; });
+      });
+      var rows = [];
+      for (var i = hi + 1; i < grid.length; i++) {
+        var g = grid[i], name = g[col.name];
+        if (!name || typeof name !== "string") continue;
+        var r = {};
+        FIELDS.forEach(function (f) { if (col[f] !== undefined) r[f] = g[col[f]] === null ? "" : g[col[f]]; });
+        // Pas de pot entamé mesuré mais stock confirmé à 0 dans le fichier : 0 cp restant.
+        var leftCol = grid[hi].findIndex(function (h) { return /^cp restants/i.test(String(h || "")); });
+        if (r.opened === "" && r.empty === "" && r.unit === "" && leftCol >= 0 && g[leftCol] === 0) r.noOpened = true;
+        rows.push(r);
+      }
+      state.rows = rows;
+      if (rows.some(function (r) { return num(r.opened) !== null; })) state.weigh = true;
+      save(); render();
+      msg.textContent = "✓ " + rows.length + " compléments importés depuis « " + file.name + " ».";
+      msg.style.color = "#2b7a3d";
+    }).catch(function (err) {
+      msg.textContent = "Import impossible : " + err.message; msg.style.color = "var(--buy)";
+    });
+    e.target.value = "";
+  });
+
+  // Export : valeurs saisies + résultats, prêt à rouvrir dans Excel.
+  document.getElementById("export").addEventListener("click", function () {
+    var P = period();
+    var head = ["Article", "Capacité (cp/boîte)", "Besoin/jour (A)", "Poids vide B (g)", "Poids 1 cp C (g)", "Sachet gel D (g)",
+      "Poids entamé E (g)", "Boîtes neuves en stock (F)", "Cp restants (ouvert)", "Total cp disponibles",
+      "Besoin sur la période (" + P.days + " j)", "Boîtes à acheter", "Notes"];
+    var data = [head].concat(state.rows.map(function (r) {
+      var c = compute(r, P.days);
+      return [r.name, num(r.cap), num(r.perDay), num(r.empty), num(r.unit), num(r.gel), num(r.opened), num(r.boxes),
+        c.left, c.total, c.need, c.buy === null ? "info manquante" : c.buy, r.note || ""];
+    }));
+    data.push([], ["Période : du " + iso(P.from) + " au " + iso(P.to) + " inclus", P.days + " jours"]);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Compléments");
+    XLSX.writeFile(wb, "complements_achats_" + iso(new Date()) + ".xlsx");
+  });
+
+  load(); render();
+</script>
+</body>
+</html>

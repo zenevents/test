@@ -53,3 +53,11 @@ seule la 6e change :
 
 Badge statique (section `#avis` de `index.html`) : note et nombre d'avis mis à jour à la main
 quand Debi les communique (dernière valeur : 4,7 – 165 avis).
+
+## Page personnelle `complements/`
+
+Calculatrice personnelle de Debi (ses compléments alimentaires), sans lien avec Debi's Kitchen :
+pas de menu, pas de lien depuis le site, `noindex`. Elle ne doit JAMAIS contenir de données dans le code
+(le dépôt est public) : Debi importe son fichier Excel, et tout reste dans le localStorage de son navigateur.
+Formule reprise de son fichier : cp restants = arrondi((poids pot ouvert − poids pot vide) / poids d'1 cp), min 0 ;
+boîtes à commander = arrondi au-dessus((cp/jour × jours − (cp restants + boîtes neuves × cp/boîte)) / cp/boîte), min 0.
