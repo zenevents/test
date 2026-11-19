@@ -26,14 +26,16 @@ seule la 6e change :
 3. Pad thaï
 4. Basilic (pad kra pao)
 5. Pad thaï
-6. Un plat à CHF 22 (curry japonais, japchae, laksa, gà façon « bì » ou bún ; le phở bò est à CHF 25)
+6. Un plat à CHF 23 (curry japonais, japchae, laksa, gà façon « bì » ou bún ; le phở bò est à CHF 26)
 
 ### Prix
 
-- CHF 19 par défaut.
-- CHF 22 : curry japonais, japchae, laksa, gà façon « bì », bún.
-- CHF 25 : phở bò.
-- +1 CHF sans contenant personnel. Desserts CHF 6 (+2 CHF de consigne), boissons CHF 4.
+Prix affichés contenant compris ; −1 CHF si le client apporte son propre contenant.
+
+- CHF 20 par défaut.
+- CHF 23 : curry japonais, japchae, laksa, gà façon « bì », bún.
+- CHF 26 : phở bò.
+- Desserts CHF 6 (+2 CHF de consigne), boissons CHF 4.
 
 ## Produits
 

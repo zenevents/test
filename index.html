@@ -62,7 +62,7 @@
         <div>
           <h3 class="menu-sub">Le programme</h3>
           <ul class="upcoming" id="programme"></ul>
-          <p class="menu-note">+1 CHF si vous n'apportez pas votre propre contenant.</p>
+          <p class="menu-note"><strong>−1 CHF</strong> si vous apportez votre propre contenant.</p>
           <p class="menu-note">📅 Le plat de la semaine et les fermetures exceptionnelles sont annoncés chaque dimanche sur notre <a href="https://chat.whatsapp.com/DR9UlsvW0ax6VxHq2TG3gI">groupe WhatsApp</a>.</p>
           <p class="menu-note"><strong>Desserts</strong> CHF 6 (+2 CHF de consigne) · <strong>Boissons</strong> CHF 4 : PET, citronnade maison ou chai latte</p>
         </div>
@@ -196,8 +196,9 @@
 
   <script>
     // Chaque plat n'est décrit qu'une fois ici ; le pad thaï est toujours présenté en premier.
-    // Prix : CHF 19 par défaut ; indiquer price pour les autres (CHF 22 : curry japonais, japchae, laksa, gà façon bì, bún ; CHF 25 : phở bò).
-    const DEFAULT_PRICE = "CHF 19";
+    // Prix affichés contenant compris (−1 CHF si le client apporte son contenant).
+    // CHF 20 par défaut ; indiquer price pour les autres (CHF 23 : curry japonais, japchae, laksa, gà façon bì, bún ; CHF 26 : phở bò).
+    const DEFAULT_PRICE = "CHF 20";
     const dishes = {
       padthai: {
         name: "Pad thaï au poulet suisse et/ou tofu bio",
@@ -221,37 +222,37 @@
       },
       curry: {
         name: "Curry japonais au poulet suisse et/ou tofu bio",
-        price: "CHF 22",
+        price: "CHF 23",
         desc: "Le curry japonais est plus doux que son cousin indien. Très prisé au Japon, il est moins relevé et plus épais que le curry d'Inde, et ses ingrédients incontournables sont les carottes, les pommes de terre et l'oignon.",
         allergens: "Servi à part : piment."
       },
       japchae: {
         name: "Japchae au poulet suisse et/ou tofu bio",
-        price: "CHF 22",
+        price: "CHF 23",
         desc: "Plat de street food coréen : nouilles tièdes de patates douces aux épinards, carottes, poivrons et oignons de printemps.",
         allergens: "Allergènes dans le plat : ail, huile de sésame. Servi à part : piment."
       },
       laksa: {
         name: "Laksa",
-        price: "CHF 22",
+        price: "CHF 23",
         desc: "La laksa est une soupe asiatique de nouilles épicées, principalement consommée en Malaisie, en Indonésie et à Singapour. C'est une soupe riche et complète à base de lait de coco, de nouilles de riz, de carottes, de pommes de terre, de poulet ou de tofu, parfumée à la pâte de curry.",
         allergens: "Allergènes dans le plat : ail, sauce de poisson. Servis à part : coriandre, piment."
       },
       gabi: {
         name: "Gà façon « bì »",
-        price: "CHF 22",
+        price: "CHF 23",
         desc: "Voici un plat très populaire à Hô-Chi-Minh-Ville (Saïgon). Au fond, une salade de concombre, carottes vinaigrées et menthe. Par-dessus, du riz à l'huile d'oignons de printemps, du poulet suisse et/ou du tofu délicatement parfumé à la poudre de riz grillé. Le tout arrosé de sauce citronnée.",
         allergens: "Allergènes dans le plat : ail, sauce d'huîtres et sauce de poisson. Servis à part : coriandre, piment."
       },
       pho: {
         name: "Phở bò",
-        price: "CHF 25",
+        price: "CHF 26",
         desc: "Voici le plat national vietnamien et le bouillon bienfaisant de l'hiver qui réchauffe, nourrit la flore intestinale, apporte des minéraux, des oligo-éléments et des vitamines… Des nouilles de riz, des pousses de soja, des oignons de printemps, du bœuf et du rumpsteak suisses. Le bouillon de bœuf et d'épices (anis étoilé, clous de girofle, poivre noir, cannelle) mijote 5 heures.",
         allergens: "Servis à part : coriandre, piment."
       },
       bun: {
         name: "Bún gà ou bún tofu",
-        price: "CHF 22",
+        price: "CHF 23",
         desc: "Le bún gà, bún tofu ou bún mixte est un plat tiède vietnamien. Au fond : de la salade verte, du concombre, des carottes vinaigrées et de la menthe fraîche. Par-dessus, les bún, des nouilles de riz tièdes, puis du poulet suisse et/ou du tofu bio à la citronnelle. Le tout accompagné d'une sauce citronnée froide.",
         allergens: "Allergènes dans le plat : ail, sauce d'huîtres et sauce de poisson. Servis à part : cacahuètes, coriandre, piment."
       }
@@ -262,8 +263,8 @@
     // Pour mettre à jour le menu, il suffit de modifier cette liste.
     // Une fermeture s'écrit avec closed à la place de dish, par ex. closed: "Fermeture d'hiver".
     // Rotation habituelle (cycle de 6 semaines, puis on recommence ; seule la 6e semaine change) :
-    //   pad thaï → satay → pad thaï → basilic (pad kra pao) → pad thaï → un plat à CHF 22
-    //   (curry japonais, japchae, laksa, gà façon bì ou bún ; phở bò à CHF 25 en hiver).
+    //   pad thaï → satay → pad thaï → basilic (pad kra pao) → pad thaï → un plat à CHF 23
+    //   (curry japonais, japchae, laksa, gà façon bì ou bún ; phở bò à CHF 26 en hiver).
     const weeks = [
       { start: "2026-10-26", end: "2026-10-30", label: "26–30 oct", dish: "padthai" },
       { start: "2026-11-02", end: "2026-11-06", label: "2–6 nov",   dish: "krapao" },
